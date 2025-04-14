@@ -1,0 +1,148 @@
+--------------------- Table Creation ----------------------
+
+CREATE TABLE orders (
+    customer_id VARCHAR(10),
+    order_date DATE,
+    item VARCHAR(100),
+    quantity INT,
+    price DECIMAL(10, 2)
+);
+
+-------------------- Inserting Values ----------------------
+
+INSERT INTO orders (customer_id, order_date, item, quantity, price)
+VALUES
+    ('AABB', '2001-02-02', 'AABBCC', 1, 1.22),
+    ('CCDD', '2001-02-15', 'XDroneX', 2, 299.99),
+    ('EEFF', '2001-03-10', 'CyberWheel', 1, 150.00),
+    ('GGHH', '2001-04-01', 'NanoBoard', 3, 88.88),
+    ('AABB', '2001-05-20', 'SkyGlider', 1, 400.00),
+    ('CCDD', '2001-06-11', 'RainShield', 2, 45.50),
+    ('EEFF', '2001-07-04', 'SpeedBoots', 1, 125.25),
+    ('IIJJ', '2001-08-18', 'HoverMat', 1, 220.00),
+    ('KKLL', '2001-09-09', 'Quantum Tent', 2, 199.99),
+    ('MMNN', '2001-10-23', 'EchoVest', 1, 75.00),
+    ('OOPP', '2001-11-11', 'ZenLamp', 1, 19.99),
+    ('CCDD', '2001-12-25', 'HoloCap', 4, 33.33),
+    ('QQRR', '2002-01-01', 'SolarPad', 2, 88.00),
+    ('SSTT', '2002-02-15', 'WindCutter', 1, 305.75),
+    ('UUVV', '2002-03-12', 'FireJar', 1, 28.88),
+    ('WWXX', '2002-03-25', 'GlideBoard', 1, 180.00),
+    ('YYZZ', '2002-04-14', 'SoundCloak', 2, 77.00),
+    ('GGHH', '2002-05-06', 'NightBeacon', 1, 55.55),
+    ('IIJJ', '2002-06-22', 'WaterWalker', 1, 260.00),
+    ('KKLL', '2002-07-30', 'MagnoGloves', 2, 39.90),
+    ('MMNN', '2002-08-19', 'GlowTent', 1, 120.00),
+    ('OOPP', '2002-09-25', 'PulseLight', 3, 27.75),
+    ('QQRR', '2002-10-10', 'CyberCane', 1, 44.44),
+    ('SSTT', '2002-11-30', 'NanoShovel', 1, 18.18),
+    ('UUVV', '2002-12-24', 'LightShield', 2, 50.00),
+    ('WWXX', '2003-01-15', 'AeroPod', 1, 315.00),
+    ('YYZZ', '2003-02-27', 'FrostBoots', 1, 99.99),
+    ('AABB', '2003-03-03', 'ChillVest', 2, 70.00),
+    ('CCDD', '2003-04-04', 'NightWalker', 1, 89.50),
+    ('EEFF', '2003-04-29', 'SparkRope', 1, 25.25),
+    ('GGHH', '2003-05-15', 'SonicGoggles', 1, 65.00),
+    ('IIJJ', '2003-06-06', 'JetPackMini', 1, 475.00);
+
+------------------------- Case Study Questions & Answers ------------------------
+
+-- 1. List all orders for customer_id = 'CCDD'.
+SELECT * FROM orders WHERE customer_id = 'CCDD';
+
+-- 2. What is the average price of items ordered in December?
+SELECT AVG(price) FROM orders WHERE MONTH(order_date) = 12;
+
+-- 3. Find the minimum price for all 'GlowTent' orders.
+SELECT MIN(price) FROM orders WHERE item = 'GlowTent';
+
+-- 4. Show each item with its maximum and minimum price.
+SELECT item, MAX(price), MIN(price) FROM orders GROUP BY item;
+
+-- 5. List all items with a maximum price greater than 200.00.
+SELECT item, MAX(price) FROM orders GROUP BY item HAVING MAX(price) > 200.00;
+
+-- 6. Select items priced over 30.00, sorted by price.
+SELECT item, price FROM orders WHERE price > 30.00 ORDER BY price ASC;
+
+-- 7. Find orders excluding items 'WaterWalker' and 'SonicGoggles'.
+SELECT customer_id, order_date, item FROM orders WHERE item NOT IN ('WaterWalker', 'SonicGoggles');
+
+-- 8. Select items and prices that start with 'C' or 'S'.
+SELECT item, price FROM orders WHERE item LIKE 'C%' OR item LIKE 'S%';
+
+-- 9. Get orders priced between 50 and 150.
+SELECT order_date, item, price FROM orders WHERE price BETWEEN 50 AND 150;
+
+-- 10. Calculate per unit price of each item.
+SELECT item, SUM(price) / SUM(quantity) AS unit_price FROM orders GROUP BY item ORDER BY unit_price DESC;
+
+-- 11. Which customers purchased more than 1 item in a single order?
+SELECT * FROM orders WHERE quantity > 1;
+
+-- 12. What is the total revenue (price × quantity) from each item?
+SELECT item, SUM(price * quantity) AS total_revenue FROM orders GROUP BY item;
+
+-- 13. List all distinct items that were ordered in 2002.
+SELECT DISTINCT item FROM orders WHERE YEAR(order_date) = 2002;
+
+-- 14. Show top 3 most expensive items ever ordered.
+SELECT item, price FROM orders ORDER BY price DESC LIMIT 3;
+
+-- 15. How many total items were ordered by customer_id 'AABB'?
+SELECT SUM(quantity) AS total_items FROM orders WHERE customer_id = 'AABB';
+
+------------------------- Aggregate Window Functions -------------------------
+
+SELECT new_id, new_cat,
+SUM(new_id) OVER( PARTITION BY new_cat ORDER BY new_id ) AS "Total",
+AVG(new_id) OVER( PARTITION BY new_cat ORDER BY new_id ) AS "Average",
+COUNT(new_id) OVER( PARTITION BY new_cat ORDER BY new_id ) AS "Count",  
+MIN(new_id) OVER( PARTITION BY new_cat ORDER BY new_id ) AS "Min",
+MAX(new_id) OVER( PARTITION BY new_cat ORDER BY new_id ) AS "Max"
+FROM test_data;
+
+------------------------- Ranking Window Functions ---------------------------
+
+SELECT new_id,
+ROW_NUMBER() OVER(ORDER BY new_id) AS "ROW_NUMBER",
+RANK() OVER(ORDER BY new_id) AS "RANK",
+DENSE_RANK() OVER(ORDER BY new_id) AS "DENSE_RANK",  
+PERCENT_RANK() OVER(ORDER BY new_id) AS "PERCENT_RANK"
+FROM test_data;
+
+------------------------- Analytic Window Functions ---------------------------
+
+SELECT new_id,
+FIRST_VALUE(new_id) OVER( ORDER BY new_id) AS "FIRST_VALUE",
+LAST_VALUE(new_id)	OVER( ORDER BY new_id) AS "LAST_VALUE",
+LEAD(new_id)	OVER( ORDER BY new_id) AS "LEAD",  
+LAG(new_id) OVER( ORDER BY new_id) AS "LAG"
+FROM test_data;
+
+------------------------- Additional Questions on Window Functions -------------------------
+
+-- 16. Show each category and running total of new_id values.
+SELECT new_id, new_cat,
+SUM(new_id) OVER (PARTITION BY new_cat ORDER BY new_id) AS running_total
+FROM test_data;
+
+-- 17. Find customers ranked by most expensive item purchased.
+SELECT customer_id, price,
+RANK() OVER (ORDER BY price DESC) AS price_rank
+FROM orders;
+
+-- 18. Display each item and the previous item’s price using LAG.
+SELECT item, price,
+LAG(price) OVER (ORDER BY order_date) AS previous_price
+FROM orders;
+
+-- 19. Get the average price of items per customer using window function.
+SELECT customer_id, price,
+AVG(price) OVER (PARTITION BY customer_id) AS avg_price_per_customer
+FROM orders;
+
+-- 20. For each order, show the first item ever ordered (by date).
+SELECT customer_id, order_date, item,
+FIRST_VALUE(item) OVER (PARTITION BY customer_id ORDER BY order_date) AS first_item
+FROM orders;
